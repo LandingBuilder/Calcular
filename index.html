@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Valores</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; background-color: #f4f4f9; }
+        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 300px; }
+        input { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #218838; }
+        table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+        th, td { border-bottom: 1px solid #ddd; padding: 8px; text-align: left; }
+        .total { margin-top: 20px; font-weight: bold; font-size: 1.2em; color: #333; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Adicionar Valor</h2>
+    <input type="number" id="valorInput" placeholder="Digite um valor (ex: 10.50)">
+    <button onclick="adicionarValor()">Adicionar à Tabela</button>
+
+    <table id="tabelaValores">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Valor</th>
+            </tr>
+        </thead>
+        <tbody>
+            </tbody>
+    </table>
+
+    <div class="total">Total: R$ <span id="somaTotal">0.00</span></div>
+</div>
+
+<script>
+    let total = 0;
+    let contador = 1;
+
+    function adicionarValor() {
+        const input = document.getElementById('valorInput');
+        const valor = parseFloat(input.value);
+
+        if (isNaN(valor)) {
+            alert("Por favor, insira um número válido.");
+            return;
+        }
+
+        // Adicionar na tabela
+        const tabela = document.getElementById('tabelaValores').getElementsByTagName('tbody')[0];
+        const novaLinha = tabela.insertRow();
+        
+        const celulaItem = novaLinha.insertCell(0);
+        const celulaValor = novaLinha.insertCell(1);
+
+        celulaItem.innerHTML = `Item ${contador++}`;
+        celulaValor.innerHTML = `R$ ${valor.toFixed(2)}`;
+
+        // Atualizar Soma
+        total += valor;
+        document.getElementById('somaTotal').innerText = total.toFixed(2);
+
+        // Limpar input
+        input.value = '';
+        input.focus();
+    }
+</script>
+
+</body>
+</html>
