@@ -38,35 +38,61 @@
 
 <script>
     let total = 0;
-    let contador = 1;
+let contador = 1;
 
-    function adicionarValor() {
-        const input = document.getElementById('valorInput');
-        const valor = parseFloat(input.value);
-
-        if (isNaN(valor)) {
-            alert("Por favor, insira um número válido.");
-            return;
-        }
-
-        // Adicionar na tabela
-        const tabela = document.getElementById('tabelaValores').getElementsByTagName('tbody')[0];
-        const novaLinha = tabela.insertRow();
-        
-        const celulaItem = novaLinha.insertCell(0);
-        const celulaValor = novaLinha.insertCell(1);
-
-        celulaItem.innerHTML = `Item ${contador++}`;
-        celulaValor.innerHTML = `R$ ${valor.toFixed(2)}`;
-
-        // Atualizar Soma
-        total += valor;
-        document.getElementById('somaTotal').innerText = total.toFixed(2);
-
-        // Limpar input
-        input.value = '';
-        input.focus();
+// Atalho para tecla Enter
+document.getElementById('valorInput').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        adicionarValor();
     }
+});
+
+function adicionarValor() {
+    const input = document.getElementById('valorInput');
+    const valor = parseFloat(input.value);
+
+    if (isNaN(valor) || valor <= 0) {
+        alert("Por favor, insira um número válido.");
+        return;
+    }
+
+    const tabela = document.getElementById('tabelaValores').getElementsByTagName('tbody')[0];
+    const novaLinha = tabela.insertRow();
+    
+    // Criamos as células
+    const celulaItem = novaLinha.insertCell(0);
+    const celulaValor = novaLinha.insertCell(1);
+    const celulaAcao = novaLinha.insertCell(2); // Nova coluna para excluir
+
+    celulaItem.innerHTML = `Item ${contador++}`;
+    celulaValor.innerHTML = `R$ ${valor.toFixed(2)}`;
+    
+    // Botão de deletar
+    const btnRemover = document.createElement('button');
+    btnRemover.innerText = 'X';
+    btnRemover.style.backgroundColor = '#dc3545';
+    btnRemover.style.padding = '2px 8px';
+    btnRemover.onclick = function() {
+        removerItem(novaLinha, valor);
+    };
+    celulaAcao.appendChild(btnRemover);
+
+    total += valor;
+    atualizarTotal();
+
+    input.value = '';
+    input.focus();
+}
+
+function removerItem(linha, valor) {
+    linha.remove();
+    total -= valor;
+    atualizarTotal();
+}
+
+function atualizarTotal() {
+    document.getElementById('somaTotal').innerText = total.toFixed(2);
+}
 </script>
 
 </body>
