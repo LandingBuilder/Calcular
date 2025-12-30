@@ -5,65 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Popular - PDV</title>
     <style>
-        /* Reset para evitar vazamentos */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        body { 
-            font-family: 'Courier New', Courier, monospace; 
-            background-color: #e9ecef; 
-            padding: 10px; 
-            display: flex; 
-            flex-direction: column;
-            align-items: center; 
-        }
-        
-        .container { 
-            background: white; 
-            padding: 10px; 
-            width: 100%; 
-            max-width: 300px; /* Largura para tela */
-            border-radius: 4px;
-        }
-
+        body { font-family: 'Courier New', Courier, monospace; background-color: #e9ecef; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        .container { background: white; padding: 10px; width: 100%; max-width: 300px; border-radius: 4px; }
         .header-print { text-align: center; border-bottom: 2px solid #000; margin-bottom: 10px; padding-bottom: 5px; }
         .header-print h1 { margin: 0; font-size: 20px; text-transform: uppercase; }
-
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; }
-        input[type=number] { 
-            width: 100%; padding: 12px; margin-bottom: 8px; 
-            border: 1px solid #333; font-size: 18px; text-align: center;
-        }
-        
+        input[type=number] { width: 100%; padding: 12px; margin-bottom: 8px; border: 1px solid #333; font-size: 18px; text-align: center; }
         .btn-group { display: flex; gap: 5px; margin-bottom: 10px; width: 100%; }
         button { flex: 1; padding: 12px; border: 1px solid #333; cursor: pointer; font-weight: bold; background: #fff; }
         #addBtn { background: #000; color: #fff; }
-        
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; } /* Força a tabela a respeitar a largura */
-        th, td { text-align: left; padding: 6px 2px; font-size: 14px; overflow: hidden; }
-        th:nth-child(1), td:nth-child(1) { width: 60%; } /* Nome da nota */
-        th:nth-child(2), td:nth-child(2) { width: 30%; } /* Valor */
-        th:nth-child(3), td:nth-child(3) { width: 10%; text-align: right; } /* Botão X */
-        
-        .total-container { 
-            margin-top: 15px; padding-top: 8px; 
-            border-top: 2px solid #000; 
-            display: flex; justify-content: space-between; 
-            font-size: 18px; font-weight: bold; 
-        }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th, td { text-align: left; padding: 6px 2px; font-size: 14px; }
+        .total-container { margin-top: 15px; padding-top: 8px; border-top: 2px solid #000; display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; }
 
-        /* AJUSTE PARA IMPRESSÃO TÉRMICA SEM VAZAMENTO */
         @media print {
             @page { margin: 0; }
             body { background: white; padding: 0; margin: 0; }
-            .container { 
-                max-width: 72mm; /* Área segura para impressoras de 80mm */
-                padding: 2mm;
-                margin: 0 auto;
-            }
-            #valorInput, .btn-group, .btn-delete, th:nth-child(3), td:nth-child(3) { 
-                display: none !important; 
-            }
-            table { width: 100%; }
+            .container { max-width: 72mm; padding: 2mm; margin: 0 auto; }
+            #valorInput, .btn-group, .btn-delete, th:nth-child(3), td:nth-child(3) { display: none !important; }
         }
     </style>
 </head>
@@ -86,7 +46,7 @@
             <tr>
                 <th>NOTA</th>
                 <th>VALOR</th>
-                <th></th>
+                <th style="width: 30px;"></th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -100,7 +60,6 @@
 
 <script>
     let total = 0;
-    let contador = 1;
 
     document.getElementById('valorInput').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') adicionarValor();
@@ -113,15 +72,19 @@
 
         const tbody = document.querySelector('#tabelaValores tbody');
         const novaLinha = tbody.insertRow();
-        const valorFormatado = valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
+        
+        // Criamos as células com classes para facilitar a atualização
         novaLinha.innerHTML = `
-            <td>Nota ${contador++}</td>
-            <td>${valorFormatado}</td>
-            <td><button class="btn-delete" style="color:red; border:none; background:none; font-weight:bold;" onclick="removerItem(this, ${valor})">X</button></td>
+            <td class="col-nome"></td>
+            <td>${valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+            <td style="text-align:right">
+                <button class="btn-delete" style="color:red; border:none; background:none; font-weight:bold; cursor:pointer;" 
+                onclick="removerItem(this, ${valor})">X</button>
+            </td>
         `;
 
         total += valor;
+        atualizarNumeracao();
         atualizarInterface(input);
     }
 
@@ -129,7 +92,18 @@
         btn.closest('tr').remove();
         total -= valor;
         if (total < 0) total = 0;
+        
+        atualizarNumeracao(); // Recontagem após remover
         atualizarInterface();
+    }
+
+    // NOVA FUNÇÃO: Percorre a tabela e renomeia as notas de 1 até o fim
+    function atualizarNumeracao() {
+        const linhas = document.querySelectorAll('#tabelaValores tbody tr');
+        linhas.forEach((linha, index) => {
+            const celulaNome = linha.querySelector('.col-nome');
+            celulaNome.innerText = `Nota ${index + 1}`;
+        });
     }
 
     function atualizarInterface(inputFocus = null) {
