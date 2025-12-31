@@ -5,25 +5,98 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Popular - PDV</title>
     <style>
+        /* --- ESTILO DO SITE (VOLTANDO AO ORIGINAL FEITO PARA TELA) --- */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Courier New', Courier, monospace; background-color: #e9ecef; padding: 10px; display: flex; flex-direction: column; align-items: center; }
-        .container { background: white; padding: 10px; width: 100%; max-width: 300px; border-radius: 4px; }
-        .header-print { text-align: center; border-bottom: 2px solid #000; margin-bottom: 10px; padding-bottom: 5px; }
-        .header-print h1 { margin: 0; font-size: 20px; text-transform: uppercase; }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; }
-        input[type=number] { width: 100%; padding: 12px; margin-bottom: 8px; border: 1px solid #333; font-size: 18px; text-align: center; }
-        .btn-group { display: flex; gap: 5px; margin-bottom: 10px; width: 100%; }
-        button { flex: 1; padding: 12px; border: 1px solid #333; cursor: pointer; font-weight: bold; background: #fff; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #e9ecef; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+        .container { 
+            background: white; 
+            padding: 20px; 
+            width: 100%; 
+            max-width: 350px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+        }
+        .header-print { text-align: center; border-bottom: 2px solid #000; margin-bottom: 15px; padding-bottom: 10px; }
+        .header-print h1 { margin: 0; font-size: 24px; text-transform: uppercase; color: #333; }
+        
+        input[type=number] { 
+            width: 100%; 
+            padding: 12px; 
+            margin-bottom: 10px; 
+            border: 1px solid #ddd; 
+            border-radius: 4px;
+            font-size: 18px; 
+            text-align: center; 
+        }
+        .btn-group { display: flex; gap: 8px; margin-bottom: 15px; width: 100%; }
+        button { 
+            flex: 1; 
+            padding: 12px; 
+            border: none; 
+            border-radius: 4px;
+            cursor: pointer; 
+            font-weight: bold; 
+            transition: opacity 0.2s;
+        }
         #addBtn { background: #000; color: #fff; }
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th, td { text-align: left; padding: 6px 2px; font-size: 14px; }
-        .total-container { margin-top: 15px; padding-top: 8px; border-top: 2px solid #000; display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; }
+        #printBtn { background: #28a745; color: #fff; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { text-align: left; padding: 10px 5px; border-bottom: 1px solid #eee; font-size: 15px; }
+        .total-container { 
+            margin-top: 20px; 
+            padding-top: 10px; 
+            border-top: 2px solid #000; 
+            display: flex; 
+            justify-content: space-between; 
+            font-size: 20px; 
+            font-weight: bold; 
+        }
 
+        /* --- CONFIGURAÇÃO EXCLUSIVA PARA IMPRESSÃO (ESTILO NOTA DA DIREITA) --- */
         @media print {
-            @page { margin: 0; }
-            body { background: white; padding: 0; margin: 0; }
-            .container { max-width: 72mm; padding: 2mm; margin: 0 auto; }
-            #valorInput, .btn-group, .btn-delete, th:nth-child(3), td:nth-child(3) { display: none !important; }
+            @page { margin: 0; size: auto; }
+            
+            /* Reset do corpo para a impressora */
+            body { background: white !important; padding: 0 !important; margin: 0 !important; }
+            .container { 
+                max-width: 100% !important; 
+                width: 100% !important; 
+                box-shadow: none !important; 
+                padding: 5mm !important;
+            }
+
+            /* Forçar a fonte da nota da direita */
+            th, td, .total-container, h1 {
+                font-family: 'Lucida Console', 'Monaco', monospace !important;
+                color: #000 !important;
+                font-weight: 900 !important; /* Nota da direita é bem escura */
+                letter-spacing: -0.5px !important;
+            }
+
+            th, td { 
+                font-size: 9pt !important; 
+                padding: 1px 0 !important; 
+                line-height: 0.8 !important; /* Espaço mínimo entre linhas */
+                border-bottom: none !important;
+            }
+
+            .header-print h1 { font-size: 14pt !important; border-bottom: 1px solid #000 !important; }
+            .total-container { font-size: 12pt !important; border-top: 1px solid #000 !important; margin-top: 5mm !important; }
+            
+            /* Esconder elementos de interface */
+            #valorInput, .btn-group, .btn-delete, th:nth-child(3), td:nth-child(3) { 
+                display: none !important; 
+            }
+            
+            .col-valor { text-align: right !important; }
         }
     </style>
 </head>
@@ -34,7 +107,7 @@
         <h1>Popular</h1>
     </div>
 
-    <input type="number" id="valorInput" placeholder="0.00" autofocus>
+    <input type="number" id="valorInput" placeholder="0.00" autofocus step="0.01">
     
     <div class="btn-group">
         <button id="addBtn" onclick="adicionarValor()">ADICIONAR</button>
@@ -45,7 +118,7 @@
         <thead>
             <tr>
                 <th>NOTA</th>
-                <th>VALOR</th>
+                <th style="text-align: right;">VALOR</th>
                 <th style="width: 30px;"></th>
             </tr>
         </thead>
@@ -73,10 +146,9 @@
         const tbody = document.querySelector('#tabelaValores tbody');
         const novaLinha = tbody.insertRow();
         
-        // Criamos as células com classes para facilitar a atualização
         novaLinha.innerHTML = `
             <td class="col-nome"></td>
-            <td>${valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+            <td class="col-valor">${valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
             <td style="text-align:right">
                 <button class="btn-delete" style="color:red; border:none; background:none; font-weight:bold; cursor:pointer;" 
                 onclick="removerItem(this, ${valor})">X</button>
@@ -92,12 +164,10 @@
         btn.closest('tr').remove();
         total -= valor;
         if (total < 0) total = 0;
-        
-        atualizarNumeracao(); // Recontagem após remover
+        atualizarNumeracao();
         atualizarInterface();
     }
 
-    // NOVA FUNÇÃO: Percorre a tabela e renomeia as notas de 1 até o fim
     function atualizarNumeracao() {
         const linhas = document.querySelectorAll('#tabelaValores tbody tr');
         linhas.forEach((linha, index) => {
@@ -107,7 +177,7 @@
     }
 
     function atualizarInterface(inputFocus = null) {
-        document.getElementById('somaTotal').innerText = total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        document.getElementById('somaTotal').innerText = `R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         if (inputFocus) { 
             inputFocus.value = ''; 
             inputFocus.focus(); 
